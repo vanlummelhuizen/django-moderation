@@ -5,7 +5,7 @@ from django.contrib import admin
 from django.contrib.contenttypes.models import ContentType
 
 try:
-    from django.core import urls
+    from django import urls
 except ImportError:
     # Django < 2.0
     from django.core import urlresolvers as urls
