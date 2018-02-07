@@ -40,7 +40,7 @@ STATUS_CHOICES = Choices(
 
 class ModeratedObject(models.Model):
     content_type = models.ForeignKey(ContentType, null=True, blank=True,
-                                     editable=False)
+                                     editable=False, on_delete=models.SET_NULL)
     object_pk = models.PositiveIntegerField(null=True, blank=True,
                                             editable=False)
     content_object = GenericForeignKey(ct_field="content_type",
@@ -57,7 +57,7 @@ class ModeratedObject(models.Model):
     by = models.ForeignKey(
         getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
         blank=True, null=True, editable=False,
-        related_name='moderated_objects')
+        related_name='moderated_objects', on_delete=models.SET_NULL)
     on = models.DateTimeField(editable=False, blank=True, null=True)
     reason = models.TextField(blank=True, null=True)
     changed_object = SerializedObjectField(serialize_format='json',
@@ -65,7 +65,7 @@ class ModeratedObject(models.Model):
     changed_by = models.ForeignKey(
         getattr(settings, 'AUTH_USER_MODEL', 'auth.User'),
         blank=True, null=True, editable=True,
-        related_name='changed_by_set')
+        related_name='changed_by_set', on_delete=models.SET_NULL)
 
     objects = ModeratedObjectManager()
 
