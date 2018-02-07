@@ -201,11 +201,11 @@ class ModeratedObjectAdmin(admin.ModelAdmin):
 
         content_type = ContentType.objects.get_for_model(changed_obj.__class__)
         try:
-            object_admin_url = urlresolvers.reverse("admin:%s_%s_change" %
+            object_admin_url = urls.reverse("admin:%s_%s_change" %
                                                     (content_type.app_label,
                                                      content_type.model),
                                                     args=(changed_obj.pk,))
-        except urlresolvers.NoReverseMatch:
+        except urls.NoReverseMatch:
             object_admin_url = None
 
         extra_context = {'changes': changes,
