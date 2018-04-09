@@ -24,6 +24,7 @@ from .signals import post_moderation, pre_moderation
 from .utils import django_19
 
 import datetime
+import uuid
 
 
 MODERATION_STATES = Choices(
@@ -38,10 +39,15 @@ STATUS_CHOICES = Choices(
 )
 
 
+
+
 class ModeratedObject(models.Model):
     content_type = models.ForeignKey(ContentType, null=True, blank=True,
                                      editable=False, on_delete=models.SET_NULL)
-    object_pk = models.PositiveIntegerField(null=True, blank=True,
+    if getattr(settings, 'MODERATED_OBJECT_PK', "") == "use_uuid":
+        object_pk = models.UUIDField(default=uuid.uuid4, editable=False)
+    else:
+        object_pk = models.PositiveIntegerField(null=True, blank=True,
                                             editable=False)
     content_object = GenericForeignKey(ct_field="content_type",
                                        fk_field="object_pk")
