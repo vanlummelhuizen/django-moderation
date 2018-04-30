@@ -18,6 +18,12 @@ def clear_builtins(attrs):
     return new_attrs
 
 
+def django_20():
+    if StrictVersion(django.get_version()) >= StrictVersion('2.0'):
+        return True
+    return False
+
+
 def django_110():
     if StrictVersion(django.get_version()) >= StrictVersion('1.10.0'):
         return True

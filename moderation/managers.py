@@ -8,7 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from . import moderation
 from .constants import MODERATION_READY_STATE
 from .queryset import ModeratedObjectQuerySet
-from .utils import django_17, django_18, django_110
+from .utils import django_17, django_18, django_110, django_20
 
 
 class MetaClass(type(Manager)):
@@ -32,7 +32,27 @@ class ModerationObjectsManager(Manager):
             (self.__class__, base_manager),
             {'use_for_related_fields': True})
 
-    if django_110():
+    if django_20():
+        def filter_moderated_objects(self, queryset):
+            only_no_relation_objects = {
+                '_relation_object': None,
+            }
+            only_ready = {
+                '_relation_object__state': MODERATION_READY_STATE,
+            }
+
+            # Find any objects that have more than one related ModeratedObject
+            annotated_queryset = queryset\
+                .annotate(num_moderation_objects=Count('_relation_object', filter=Q(**only_ready)))\
+                .filter(num_moderation_objects__gt=1)
+
+            if annotated_queryset.exists():
+                # No sensible default action here. You need to override
+                # filter_moderated_objects() to handle this as you see fit.
+                raise self.MultipleModerations(annotated_queryset)
+            return queryset.filter(Q(**only_no_relation_objects) | Q(**only_ready))
+
+    elif django_110():
         def filter_moderated_objects(self, queryset):
             # Find any objects that have more than one related ModeratedObject
             annotated_queryset = queryset\
